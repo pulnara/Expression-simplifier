@@ -83,14 +83,17 @@ def validate(ex):
 def convert_to_RPN(ex):
     stack = []
     converted = []
+    variables = []
 
     variable_tmp = ""
     for i in ex:
+        #print(i)
         if i in VARS:
             variable_tmp += i
         else:
             if variable_tmp != "":
-                converted += variable_tmp
+                converted.append(variable_tmp)
+                if variable_tmp not in variables: variables.append(variable_tmp)
                 variable_tmp = ""
             if i in OPS.keys():
                 while len(stack) > 0 and stack[len(stack)-1] in OPS.keys() and \
@@ -103,9 +106,12 @@ def convert_to_RPN(ex):
                 while stack[len(stack)-1] != '(':
                     converted += stack.pop()
                 stack.pop()    # (
+    if variable_tmp != "":
+        if variable_tmp not in variables: variables.append(variable_tmp)
+        converted.append(variable_tmp)
     while len(stack) > 0:
         converted += stack.pop()
-    return converted
+    return converted, variables
 
 def main():
     try:
@@ -127,7 +133,10 @@ def main():
         exit(1)
     #print(expr)
 
-    print("RPN: ", convert_to_RPN(expr))
+    rpn, variables = convert_to_RPN(expr)
+    print("RPN: ", rpn)
+    print(len(variables))
+
 ##    print("Minimalization result: " + expr)
 
 if __name__ == "__main__":
