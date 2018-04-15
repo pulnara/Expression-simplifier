@@ -41,6 +41,7 @@ def validate(ex):
     bracket_stack = []
     for i in ex:
         if i in variables:
+            #print(i)
             if prev in [R_Bracket]: error("incorrect brackets")
             if prev in [Number] and flag == 0: error("variable starting with a number")
             if i.isnumeric():
@@ -54,13 +55,13 @@ def validate(ex):
                 flag = 0
                 prev = Letter      
         elif i in operators:
-            if prev in [None, Operator] and i != '~': error("binary operator used as an unary")
+            if prev in [None, Operator, L_Bracket] and i != '~': error("binary operator used as an unary")
+            if prev in [R_Bracket, Letter, Number] and i == '~': error("unary operator used as a binary")
             prev = Operator
         elif i == '(':
             if prev in [Letter, Number, R_Bracket]: error("incorrect brackets")
             prev = L_Bracket
-            bracket_stack.append(L_Bracket)
-            
+            bracket_stack.append(L_Bracket)         
         elif i == ')':
             if len(bracket_stack) == 0: error("incompatible brackets")
             bracket_stack.pop()
@@ -85,9 +86,7 @@ def main():
     expr = sys.argv[1]
     #print(expr)
     expr = validate(expr)
-    print(expr)
-    #print(check_brackets_and_states(expr))
-    
+    print(expr)    
     
 if __name__ == "__main__":
     main()
