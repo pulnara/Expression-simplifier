@@ -160,42 +160,6 @@ def get_positive_results(possible_vals, arguments, rpn):
             positive.append(vals_list)
     return positive
 
-# def merge(x, y):
-#     changes_ctr = 0
-#     result = ""
-#     for a, b in zip(x, y):
-#         if a == b: result += str(a)
-#         else:
-#             result += "-"
-#             changes_ctr += 1
-#     if changes_ctr == 1: return result
-#     return False
-#
-# def reduce(expr):
-#     result = []
-#     merge_flag = False      # czy nastapilo jakiekolwiek laczenie
-#     for row1 in expr:
-#         merge_tmp = False   # czy polaczylo dany element z czymkolwiek
-#         for row2 in expr:
-#             res = merge(row1, row2)
-#             if res:
-#                 result.append(res)
-#                 merge_tmp = merge_flag = True
-#         if not merge_tmp: result.append(row1)
-#     if merge_flag: return reduce(result)
-#     return result
-#
-# def get_simplified(expr, variables):
-#     result = ""
-#     for el in expr:
-#         res = ""
-#         for i in range(len(el)):
-#             if el[i] == '-': continue
-#             if el[i] == '0': res+="~"
-#             res += variables[i] + "&"
-#         result += "(" + res[:-1] + ")|"
-#     return result[:-1]
-
 def main():
     try:
         if len(sys.argv) < 2:
@@ -220,12 +184,7 @@ def main():
     print("RPN: ", rpn)
     #print(len(variables))
     possible = get_possible_arg_vals(len(variables))
-
     #print(get_positive_results(possible, variables, rpn))
-
-    # minimized = reduce(get_positive_results(possible, variables, rpn))
-    #print(minimized)
-
     # print("Minimalization result: ", get_simplified(minimized, variables))
 
 if __name__ == "__main__":
