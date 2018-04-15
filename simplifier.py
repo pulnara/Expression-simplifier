@@ -23,12 +23,12 @@ def validate(ex):
         if i in variables:
             if last == ' ' and var == 1:
                 #print(i)
-                error("invalid variables sequence")
+                raise ValueError("invalid variables sequence")
             var = 1
         elif i in operators:
             var = 0
         elif i not in "()" + ' ':
-            error("invalid character")
+            raise ValueError("invalid character")
         before_last = last
         last = i
     ex = "".join(ex.split())
@@ -42,12 +42,12 @@ def validate(ex):
     for i in ex:
         if i in variables:
             #print(i)
-            if prev in [R_Bracket]: error("incorrect brackets")
-            if prev in [Number] and flag == 0: error("variable starting with a number")
+            if prev in [R_Bracket]: raise ValueError("incorrect brackets")
+            if prev in [Number] and flag == 0: raise ValueError("variable starting with a number")
             if i.isnumeric():
                 if prev in [None, Operator, L_Bracket, R_Bracket]:
                     if int(i) not in [0, 1]:
-                        error("variable starting with a number")
+                        raise ValueError("variable starting with a number")
                 if prev == Letter:
                     flag = 1
                 prev = Number
@@ -55,38 +55,49 @@ def validate(ex):
                 flag = 0
                 prev = Letter      
         elif i in operators:
-            if prev in [None, Operator, L_Bracket] and i != '~': error("binary operator used as an unary")
-            if prev in [R_Bracket, Letter, Number] and i == '~': error("unary operator used as a binary")
+            if prev in [None, Operator, L_Bracket] and i != '~': raise ValueError("binary operator used as an unary")
+            if prev in [R_Bracket, Letter, Number] and i == '~': raise ValueError("unary operator used as a binary")
             prev = Operator
         elif i == '(':
-            if prev in [Letter, Number, R_Bracket]: error("incorrect brackets")
+            if prev in [Letter, Number, R_Bracket]: raise ValueError("incorrect brackets")
             prev = L_Bracket
             bracket_stack.append(L_Bracket)         
         elif i == ')':
-            if len(bracket_stack) == 0: error("incompatible brackets")
+            if len(bracket_stack) == 0: raise ValueError("incompatible brackets")
             bracket_stack.pop()
-            if prev in [Operator, L_Bracket]: error("incorrect brackets")
+            if prev in [Operator, L_Bracket]: raise ValueError("incorrect brackets")
             prev = R_Bracket            
             
-    if prev == Operator: error("operator shouldn't be at the end")           
-    if len(bracket_stack) > 0: error("incompatible brackets")
+    if prev == Operator: raise ValueError("operator shouldn't be at the end")           
+    if len(bracket_stack) > 0: raise ValueError("incompatible brackets")
     return ex
             
-
-def error(info):
-    print("Error: " + info)
-    exit(1)
+def convert_to_RPN(ex):
+    stack = []
+    result = []
     
     
 def main():
-    if len(sys.argv) < 2:
-        error("no expression given")
-    elif len(sys.argv) > 2:
-        error("too many arguments given")
+    try:
+        if len(sys.argv) < 2:
+            raise Exception("no expression given")
+        elif len(sys.argv) > 2:
+            raise ValueError("too many arguments given")
+    except Exception as e:
+        print("Error: " + str(e))
+        exit(1)
+        
     expr = sys.argv[1]
-    #print(expr)
-    expr = validate(expr)
-    print(expr)    
+    print("Input expression: " + expr)
+    
+    try:
+        expr = validate(expr)
+    except ValueError as e:
+        print("Error: " + str(e))
+        exit(1)
+    
+    print(expr)
+##    print("Minimalization result: " + expr)
     
 if __name__ == "__main__":
     main()
