@@ -2,9 +2,9 @@ import itertools
 
 class Quine_McCluskey_simplifier:
 
-    def __init__(self, operators, expr_variables, rpn):
+    def __init__(self, operators, variables, rpn):
         self.operators = operators
-        self.variables = expr_variables
+        self.variables = variables
         self.rpn = rpn
 
     def __get_possible_arg_vals(self, arg_num):

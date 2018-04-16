@@ -1,8 +1,8 @@
 class RPN_converter:
 
-    def __init__(self, operators, variables):
+    def __init__(self, operators, characters):
         self.operators = operators
-        self.variables = variables
+        self.characters = characters
 
     # shunting-yard algorithm
     def convert(self, ex):
@@ -13,7 +13,7 @@ class RPN_converter:
         variable_tmp = ""
         for i in ex:
             #print(i)
-            if i in self.variables:
+            if i in self.characters:
                 variable_tmp += i
             else:
                 if variable_tmp != "":

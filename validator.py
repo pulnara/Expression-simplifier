@@ -1,8 +1,8 @@
 class Validator(object):
 
-    def __init__(self, operators, variables):
+    def __init__(self, operators, characters):
         self.operators = operators
-        self.variables = variables
+        self.characters = characters
 
     def validate(self, ex):
         ##    & - koniunkcja,
@@ -20,7 +20,7 @@ class Validator(object):
 
         # checks if there are spaces between variables or invalid characters
         for i in ex:
-            if i in self.variables:
+            if i in self.characters:
                 if last == ' ' and var == 1:
                     #print(i)
                     raise ValueError("invalid variables sequence")
@@ -40,7 +40,7 @@ class Validator(object):
         prev = None
         bracket_stack = []
         for i in ex:
-            if i in self.variables:
+            if i in self.characters:
                 #print(i)
                 if prev in [R_Bracket]: raise ValueError("incorrect brackets")
                 if prev in [Number] and flag == 0:

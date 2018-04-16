@@ -3,11 +3,10 @@ from converter import RPN_converter
 from simplifier import Quine_McCluskey_simplifier
 import sys
 
-OPS = {'|': 1, '&': 2, '^': 1, '~': 3, '>': 0, '=': 0}
-VARS = "".join([chr(i) for i in range(97, 123)]) + "".join([chr(i) for i \
-    in range(65, 91)]) + "".join(list(map(str, range(10))))
-
 def main():
+    operators = {'|': 1, '&': 2, '^': 1, '~': 3, '>': 0, '=': 0}
+    characters = "".join([chr(i) for i in range(97, 123)]) + "".join([chr(i) for i \
+                    in range(65, 91)]) + "".join(list(map(str, range(10))))
     try:
         if len(sys.argv) < 2:
             raise Exception("no expression given")
@@ -15,12 +14,12 @@ def main():
             raise Exception("too many arguments given")
         expr = sys.argv[1]
         print("Input expression: ", expr)
-        validator = Validator(OPS, VARS)
+        validator = Validator(operators, characters)
         expr = validator.validate(expr)
-        converter = RPN_converter(OPS, VARS)
+        converter = RPN_converter(operators, characters)
         rpn, variables = converter.convert(expr)
         print("RPN: ", rpn)
-        simplifier = Quine_McCluskey_simplifier(OPS, variables, rpn)
+        simplifier = Quine_McCluskey_simplifier(operators, variables, rpn)
         simplifier.simplify()
 
     except Exception as e:
