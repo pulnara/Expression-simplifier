@@ -18,7 +18,8 @@ class RPN_converter:
             else:
                 if variable_tmp != "":
                     converted.append(variable_tmp)
-                    if variable_tmp not in expr_variables: expr_variables.append(variable_tmp)
+                    if variable_tmp not in expr_variables and variable_tmp not in ['0', '1']:
+                        expr_variables.append(variable_tmp)
                     variable_tmp = ""
                 if i in self.operators.keys():
                     while len(stack) > 0 and stack[len(stack)-1] in self.operators.keys() and \
@@ -32,9 +33,10 @@ class RPN_converter:
                         converted += stack.pop()
                     stack.pop()    # (
         if variable_tmp != "":
-            if variable_tmp not in expr_variables: expr_variables.append(variable_tmp)
+            if variable_tmp not in expr_variables and variable_tmp not in ['0', '1']:
+                expr_variables.append(variable_tmp)
             converted.append(variable_tmp)
         while len(stack) > 0:
             converted += stack.pop()
-        #print(expr_variables)
+        print(expr_variables)
         return converted, expr_variables

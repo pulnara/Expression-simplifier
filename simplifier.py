@@ -17,7 +17,7 @@ class Quine_McCluskey_simplifier:
                 rpn2[rpn2.index(el)] = values[el]
                 #print(values[el])
         #print(rpn)
-        #print(rpn2)
+        # print(rpn2)
         stack = []
         for el in rpn2:
             if el in self.operators and el != '~':
@@ -48,12 +48,13 @@ class Quine_McCluskey_simplifier:
             # print(vals_list)
             # print(rpn)
             dictionary = dict(zip(arguments, vals_list))
-            #print(dictionary)
+            # print(dictionary)
             if self.__evaluate_expression(rpn, dictionary):
                 positive.append(vals_list)
+        # print("positive ", positive)
         return positive
 
     def simplify(self):
         possible = self.__get_possible_arg_vals(len(self.variables))
         #print(possible)
-        print(self.__get_positive_results(possible, self.variables, self.rpn))
+        self.__get_positive_results(possible, self.variables, self.rpn)
