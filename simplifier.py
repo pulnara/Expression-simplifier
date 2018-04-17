@@ -168,38 +168,3 @@ class Quine_McCluskey_simplifier:
         mccluskey_dict = self.__quine_mccluskey(d)
         result =  self.__buid_expression(mccluskey_dict, dictionary)
         # print("Simplified: ", result)
-
-
-"""used = []
-            dictionary = {}
-            for i in range(0, len(values) - 1):
-                group1 = values[i]
-                group2 = values[i+1]
-                print("1 ", group1, " 2 ", group2)
-                for el1 in group1:
-                    for el2 in group2:
-                        dec = lambda x: int("".join(list(map(str,x))),2)
-                        position = self.__different_on_one_position(el1, el2)
-                        if position:
-                            # print(dec(el1), dec(el2))
-                            # print(self.__merge(el1, position))
-                            dictionary[(dec(el1), dec(el2))] = self.__merge(el1, position)
-                            if dec(el1) not in used: used.append(dec(el1))
-                            if dec(el2) not in used: used.append(dec(el2))
-
-            # print("U ", used)
-            print(dictionary)
-            # k = list(dictionary.keys())
-            # for i in range(0, len(k)-1):
-            #     for j in range (i+1, len(k)):
-            #         if self.__get_number_of_ones(dictionary[k[i]]) == self.__get_number_of_ones(dictionary[k[j]]):
-            #             print(dictionary[k[i]], dictionary[k[j]])
-            return True
-             # print("dsdssd", d)
-        sorted = self.__sort_by_number_of_ones(positive_results)
-        # print(sorted)
-        # for el in sorted:
-        #     for i in el:
-        #         print(int("".join(list(map(str,i))),2))
-                # print(int("".join(i), 2))
-        # print(self.__different_on_one_position([0, 0, 1], [1, 0, 1]))"""
