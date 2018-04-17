@@ -1,4 +1,5 @@
 import itertools
+from collections import OrderedDict
 
 class Quine_McCluskey_simplifier:
 
@@ -42,28 +43,163 @@ class Quine_McCluskey_simplifier:
 
     def __get_positive_results(self, possible_vals):
         positive = []
-        #print(rpn)
-        for value in possible_vals:
+        dicti = {}
+        for i in range (0, len(possible_vals)):
+            value = possible_vals[i]
             vals_list = list(value)
             # print(vals_list)
-            # print(rpn)
+            # print("fffs", self.rpn)
             dictionary = dict(zip(self.variables, vals_list))
-            # print(dictionary)
+            print(dictionary)
             if self.__evaluate_expression(dictionary):
                 positive.append(vals_list)
+                dicti[i] = vals_list
         # print("positive ", positive)
-        return positive
+        return positive, dicti
 
-    def __sort_by_number_of_1(self, positive_res):
+    def __sort_by_number_of_ones(self, positive_res):
         result = []
         for i in range (0, len(self.variables)+1):
             tmp = filter(lambda x: sum(x) == i, positive_res)
             result += [list(tmp)]
         return result
 
+    def __different_on_one_position(self, l1, l2):
+        position = 0;
+        for i in range (0, len(l1)):
+            if l1[i] in [1, 0] and l2[i] in [1, 0] and l1[i] != l2[i]:
+                if position > 0: return False
+                position = i+1
+        return position
+
+    def __merge(self, el1, position):
+        result = el1[:]
+        result[position-1] = '-'
+        return result
+
+    def __get_number_of_ones(self, list):
+        counter = 0
+        for el in list:
+            if el == 1: counter +=1
+        return counter
+
+    def __buid_expression(self, dictionary, positive_results):
+        unique_simplified = []
+        unique_rows = []
+        for el in dictionary:
+            # print(dictionary[el])
+            if dictionary[el] not in unique_simplified:
+                unique_simplified.append(dictionary[el])
+                unique_rows.append(el)
+        print(unique_simplified)
+        print(unique_rows)
+
+        matrix = [[0 for x in range(len(positive_results))] for y in range(len(unique_simplified))]
+
+        values = list(positive_results.keys())
+        for ind, value in enumerate(values):
+            print(ind, value)
+            for i in range(0, len(unique_rows)):
+                el = unique_rows[i]
+                if value in el:
+                    matrix[i][ind] = 1
+
+        for row in matrix:
+            print(row)
+
+    def __quine_mccluskey(self, values_dict):
+        dictionary = values_dict
+        matched = 1
+        while matched:
+            flag = 0
+            # used = [][:]
+            used = set()
+            # print(used)
+            print(dictionary)
+            new_dict = {}
+            k = list(dictionary.keys())
+            for i in range(0, len(k)-1):
+                flag = 0
+                for j in range (i+1, len(k)):
+                    el1 = dictionary[k[i]]; el2 = dictionary[k[j]]
+                    if self.__get_number_of_ones(el1) + 1 == self.__get_number_of_ones(el2):
+                        # print(el1, el2)
+                        pos = self.__different_on_one_position(el1, el2)
+                        if pos:
+                            flag = 1
+                            merged = self.__merge(el1, pos)
+                            #print(merged)
+                            if k[i].__class__ == tuple:
+                                new_tuple = k[i] + k[j]
+                            else:
+                                new_tuple = k[i], k[j]
+                            used.add(k[i])
+                            used.add(k[j])
+                            #print(new_tuple)
+                            new_dict[new_tuple] = merged
+            # used = list(set(used))
+            print(used)
+            for el in dictionary.keys():
+                if el not in used: new_dict[el] = dictionary[el]
+            # print(new_dict)
+            dictionary = new_dict
+            matched = flag
+        print(dictionary)
+        return dictionary
+
     def simplify(self):
+        print(self.variables)
+        print(self.rpn)
         possible = self.__get_possible_arg_vals(len(self.variables))
-        # print("poss ", possible)
-        positive_results = self.__get_positive_results(possible)
-        sorted = self.__sort_by_number_of_1(positive_results)
-        print(sorted)
+        print("poss ", possible)
+        positive_results, dictionary = self.__get_positive_results(possible)
+        # print(dictionary)
+        print("posit", positive_results)
+
+        if len(positive_results) == 0:
+            print("Always false.")
+            exit(0)
+
+
+        d = {}
+        for el in positive_results:
+            d[int("".join(list(map(str,el))),2)] = el
+
+        mccluskey_dict = self.__quine_mccluskey(d)
+        result =  self.__buid_expression(mccluskey_dict, dictionary)
+        # print("Simplified: ", result)
+
+
+"""used = []
+            dictionary = {}
+            for i in range(0, len(values) - 1):
+                group1 = values[i]
+                group2 = values[i+1]
+                print("1 ", group1, " 2 ", group2)
+                for el1 in group1:
+                    for el2 in group2:
+                        dec = lambda x: int("".join(list(map(str,x))),2)
+                        position = self.__different_on_one_position(el1, el2)
+                        if position:
+                            # print(dec(el1), dec(el2))
+                            # print(self.__merge(el1, position))
+                            dictionary[(dec(el1), dec(el2))] = self.__merge(el1, position)
+                            if dec(el1) not in used: used.append(dec(el1))
+                            if dec(el2) not in used: used.append(dec(el2))
+
+            # print("U ", used)
+            print(dictionary)
+            # k = list(dictionary.keys())
+            # for i in range(0, len(k)-1):
+            #     for j in range (i+1, len(k)):
+            #         if self.__get_number_of_ones(dictionary[k[i]]) == self.__get_number_of_ones(dictionary[k[j]]):
+            #             print(dictionary[k[i]], dictionary[k[j]])
+            return True
+             # print("dsdssd", d)
+        sorted = self.__sort_by_number_of_ones(positive_results)
+        # print(sorted)
+        # for el in sorted:
+        #     for i in el:
+        #         print(int("".join(list(map(str,i))),2))
+                # print(int("".join(i), 2))
+        # print(self.__different_on_one_position([0, 0, 1], [1, 0, 1]))"""
