@@ -138,15 +138,17 @@ class Quine_McCluskey_simplifier:
 
         res = ""
         for index, i in enumerate(unique_simplified):
-            for j in range(len(i)):
-                if i[j] == 1:
-                    if res != "" and res[len(res)-1] not in['|', '&']: res += "&"
-                    res += self.variables[j]
-                elif i[j] == 0:
-                    if res != "" and res[len(res)-1] not in['|', '&']: res += "&"
-                    res += "~" + str(self.variables[j])
-            if index < len(unique_simplified)-1:
-                res += "|"
+            for el in rows_taken:
+                if dictionary[el] == i:
+                    for j in range(len(i)):
+                        if i[j] == 1:
+                            if res != "" and res[len(res)-1] not in['|', '&']: res += "&"
+                            res += self.variables[j]
+                        elif i[j] == 0:
+                            if res != "" and res[len(res)-1] not in['|', '&']: res += "&"
+                            res += "~" + str(self.variables[j])
+                    if index < len(unique_simplified)-1:
+                        res += "|"
         return res
 
     # main part of Quine-McCluskey algorithm - minimizes function by searching for all matches
