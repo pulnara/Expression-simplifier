@@ -107,8 +107,8 @@ class Quine_McCluskey_simplifier:
                 el = unique_rows[i]
                 if el.__class__ == int and value == el or value in el:
                     matrix[i][ind] = 1
-        for row in matrix:
-            print(row)
+        # for row in matrix:
+        #     print(row)
 
         flag = 1
         used = []
