@@ -4,7 +4,7 @@ class RPN_converter:
         self.operators = operators
         self.characters = characters
 
-    # shunting-yard algorithm
+    # infix to RPN: shunting-yard algorithm
     def convert(self, ex):
         stack = []
         converted = []
@@ -12,12 +12,14 @@ class RPN_converter:
 
         variable_tmp = ""
         for i in ex:
-            #print(i)
             if i in self.characters:
                 variable_tmp += i
             else:
                 if variable_tmp != "":
-                    converted.append(variable_tmp)
+                    if variable_tmp in ['0', '1']:
+                        converted.append(int(variable_tmp))
+                    else:
+                        converted.append(variable_tmp)
                     if variable_tmp not in expr_variables and variable_tmp not in ['0', '1']:
                         expr_variables.append(variable_tmp)
                     variable_tmp = ""
@@ -35,7 +37,10 @@ class RPN_converter:
         if variable_tmp != "":
             if variable_tmp not in expr_variables and variable_tmp not in ['0', '1']:
                 expr_variables.append(variable_tmp)
-            converted.append(variable_tmp)
+            if variable_tmp in ['0', '1']:
+                converted.append(int(variable_tmp))
+            else:
+                converted.append(variable_tmp)
         while len(stack) > 0:
             converted += stack.pop()
         print("Variables: ", expr_variables)
