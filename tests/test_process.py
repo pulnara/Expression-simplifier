@@ -23,6 +23,8 @@ class TestProcess(TestCase):
         self.assertEqual(process("0&1"), "Always false")
         self.assertEqual(process("0>abcdefg"), "Always true")
         self.assertEqual(process("c | ~(b & c)"), "Always true")
+        self.assertEqual(process("(a&b&~c&~d)|(~b&c&~d)|(a&~c&d)|(a&~b&~c)|(b&c&~d)"), "c&~d|a&~c")
+        self.assertEqual(process("p|q>r"), "~p&~q|r")
 
 
 
