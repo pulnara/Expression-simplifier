@@ -38,5 +38,5 @@ class RPN_converter:
             converted.append(variable_tmp)
         while len(stack) > 0:
             converted += stack.pop()
-        print(expr_variables)
+        print("Variables: ", expr_variables)
         return converted, expr_variables

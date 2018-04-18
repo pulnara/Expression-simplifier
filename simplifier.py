@@ -16,7 +16,6 @@ class Quine_McCluskey_simplifier:
         for el in rpn2:
             if el in values.keys():
                 rpn2[rpn2.index(el)] = values[el]
-                #print(values[el])
         #print(self.rpn)
         # print(rpn2)
         stack = []
@@ -46,11 +45,11 @@ class Quine_McCluskey_simplifier:
         dicti = {}
         for i in range (0, len(possible_vals)):
             value = possible_vals[i]
+            # print(value)
             vals_list = list(value)
             # print(vals_list)
-            # print("fffs", self.rpn)
             dictionary = dict(zip(self.variables, vals_list))
-            print(dictionary)
+            # print(dictionary)
             if self.__evaluate_expression(dictionary):
                 positive.append(vals_list)
                 dicti[i] = vals_list
@@ -91,21 +90,56 @@ class Quine_McCluskey_simplifier:
             if dictionary[el] not in unique_simplified:
                 unique_simplified.append(dictionary[el])
                 unique_rows.append(el)
-        print(unique_simplified)
-        print(unique_rows)
-
+        # print(unique_simplified)
+        # print(unique_rows)
         matrix = [[0 for x in range(len(positive_results))] for y in range(len(unique_simplified))]
-
         values = list(positive_results.keys())
         for ind, value in enumerate(values):
-            print(ind, value)
             for i in range(0, len(unique_rows)):
                 el = unique_rows[i]
-                if value in el:
+                if el.__class__ == int and value == el or value in el:
                     matrix[i][ind] = 1
+        # for row in matrix:
+        #     print(row)
 
-        for row in matrix:
-            print(row)
+        flag = 1
+        used = []
+        dots = 1
+        rows_taken = set()
+
+        while flag:
+            for j in range(0, len(values)):
+                counter = 0
+                tmp = -1
+                for i in range(0, len(unique_rows)):
+                    if matrix[i][j] == 1:
+                        counter += 1
+                        tmp = i
+                if counter == dots:
+                    for i in range(0, len(values)):
+                        if matrix[tmp][i] == 1 and values[i] not in used:
+                            used.append(values[i])
+                            rows_taken.add(unique_rows[tmp])
+            if set(used) == set(values):
+                flag = 0
+            else:
+                dots += 1
+        # print(self.variables)
+        # print(rows_taken)
+        # print(unique_simplified)
+
+        res = ""
+        for index, i in enumerate(unique_simplified):
+            for j in range(len(i)):
+                if i[j] == 1:
+                    if res != "" and res[len(res)-1] not in['|', '&']: res += "&"
+                    res += self.variables[j]
+                elif i[j] == 0:
+                    if res != "" and res[len(res)-1] not in['|', '&']: res += "&"
+                    res += "~" + str(self.variables[j])
+            if index < len(unique_simplified)-1:
+                res += "|"
+        return res
 
     def __quine_mccluskey(self, values_dict):
         dictionary = values_dict
@@ -115,7 +149,7 @@ class Quine_McCluskey_simplifier:
             # used = [][:]
             used = set()
             # print(used)
-            print(dictionary)
+            # print(dictionary)
             new_dict = {}
             k = list(dictionary.keys())
             for i in range(0, len(k)-1):
@@ -138,33 +172,38 @@ class Quine_McCluskey_simplifier:
                             #print(new_tuple)
                             new_dict[new_tuple] = merged
             # used = list(set(used))
-            print(used)
+            # print(used)
             for el in dictionary.keys():
                 if el not in used: new_dict[el] = dictionary[el]
             # print(new_dict)
             dictionary = new_dict
             matched = flag
-        print(dictionary)
+        # print(dictionary)
         return dictionary
 
     def simplify(self):
-        print(self.variables)
-        print(self.rpn)
+        # print(self.variables)
         possible = self.__get_possible_arg_vals(len(self.variables))
-        print("poss ", possible)
+        # print("poss ", possible)
         positive_results, dictionary = self.__get_positive_results(possible)
         # print(dictionary)
-        print("posit", positive_results)
+        # print("positive ", positive_results)
 
         if len(positive_results) == 0:
             print("Always false.")
             exit(0)
-
-
         d = {}
         for el in positive_results:
+            # print(el)
             d[int("".join(list(map(str,el))),2)] = el
-
         mccluskey_dict = self.__quine_mccluskey(d)
+        # print(mccluskey_dict)
+        for el in mccluskey_dict.values():
+            flag = 1
+            for i in el:
+                if i != '-': flag = 0
+            if flag:
+                print("Always true.")
+                exit(0)
         result =  self.__buid_expression(mccluskey_dict, dictionary)
-        # print("Simplified: ", result)
+        print("Simplified: ", result)
