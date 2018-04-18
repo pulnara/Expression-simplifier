@@ -1,5 +1,4 @@
 import itertools
-from collections import OrderedDict
 
 class Quine_McCluskey_simplifier:
 
@@ -8,9 +7,11 @@ class Quine_McCluskey_simplifier:
         self.variables = variables
         self.rpn = rpn
 
+    # gets all variations of possible arguments' values
     def __get_possible_arg_vals(self, arg_num):
         return list(itertools.product(range(2), repeat=arg_num))
 
+    # evaluates given version of args' values
     def __evaluate_expression(self, values):
         rpn2 = self.rpn[:]
         for el in rpn2:
@@ -40,6 +41,7 @@ class Quine_McCluskey_simplifier:
                 stack.append(el)
         return stack.pop()
 
+    # gets all versions of argument's values for which expression is true
     def __get_positive_results(self, possible_vals):
         positive = []
         dicti = {}
@@ -52,54 +54,44 @@ class Quine_McCluskey_simplifier:
             exit(0)
         for i in range (0, len(possible_vals)):
             value = possible_vals[i]
-            # print(value)
             vals_list = list(value)
-            # print(vals_list)
             dictionary = dict(zip(self.variables, vals_list))
-            # print(dictionary)
             if self.__evaluate_expression(dictionary):
                 positive.append(vals_list)
                 dicti[i] = vals_list
-        # print("positive ", positive)
         return positive, dicti
 
-    def __sort_by_number_of_ones(self, positive_res):
-        result = []
-        for i in range (0, len(self.variables)+1):
-            tmp = filter(lambda x: sum(x) == i, positive_res)
-            result += [list(tmp)]
-        return result
-
+    # checks if given elements (f.e. [0, 0, 0] and [0, 0, 1]) differ on exactly one position, if yes - returns position
     def __different_on_one_position(self, l1, l2):
         position = 0;
-        # print(l1, l2)
         for i in range (0, len(l1)):
             if ((l1[i] in [1, 0] and l2[i] in [1, 0]) or (l1[i] in [1, 0] and l2[i] == '-') or (l2[i] in [1, 0] and l1[i] == '-')) and l1[i] != l2[i]:
                 if position > 0: return False
                 position = i+1
         return position
 
+    # connects two elements that differ on one position (f.e. [0, 0, 1] + [0, 0, 0] = [0, 0, '-'])
     def __merge(self, el1, position):
         result = el1[:]
         result[position-1] = '-'
         return result
 
+    # returns number of ones in element
     def __get_number_of_ones(self, list):
         counter = 0
         for el in list:
             if el == 1: counter +=1
         return counter
 
+    # builds the last table in algorithm, chooses the least possible number of rows that cover all columns
+    # builds the final expression
     def __build_expression(self, dictionary, positive_results):
         unique_simplified = []
         unique_rows = []
         for el in dictionary:
-            # print(dictionary[el])
             if dictionary[el] not in unique_simplified:
                 unique_simplified.append(dictionary[el])
                 unique_rows.append(el)
-        print("US", unique_simplified)
-        print("UR", unique_rows)
         values_set = set()
         for el in unique_rows:
             if el.__class__ != int:
@@ -107,7 +99,6 @@ class Quine_McCluskey_simplifier:
                     values_set.add(i)
             else:
                 values_set.add(el)
-        # print(values_set)
 
         matrix = [[0 for x in range(len(positive_results))] for y in range(len(unique_simplified))]
         values = list(positive_results.keys())
@@ -141,6 +132,7 @@ class Quine_McCluskey_simplifier:
                 flag = 0
             else:
                 dots += 1
+
         # print(self.variables)
         # print(rows_taken)
         # print(unique_simplified)
@@ -158,67 +150,52 @@ class Quine_McCluskey_simplifier:
                 res += "|"
         return res
 
+    # main part of Quine-McCluskey algorithm - minimizes function by searching for all matches
     def __quine_mccluskey(self, values_dict):
         dictionary = values_dict
         matched = 1
         while matched:
-            print("DIC", dictionary)
-            flag = 0
             # used = [][:]
             used = set()
-            # print(used)
             new_dict = {}
             k = list(dictionary.keys())
             flag = 0
             for i in range(0, len(k)-1):
-                print(dictionary[k[i]])
                 for j in range (i+1, len(k)):
                     el1 = dictionary[k[i]]; el2 = dictionary[k[j]]
-                    print(el1, el2)
                     if abs(self.__get_number_of_ones(el1)-self.__get_number_of_ones(el2)) == 1:
-                        print(el1, el2)
                         pos = self.__different_on_one_position(el1, el2)
                         if pos:
                             flag = 1
                             merged = self.__merge(el1, pos)
-                            print(merged)
-                            print()
                             if k[i].__class__ == tuple:
                                 new_tuple = k[i] + k[j]
                             else:
                                 new_tuple = k[i], k[j]
                             used.add(k[i])
                             used.add(k[j])
-                            #print(new_tuple)
                             new_dict[new_tuple] = merged
-            # used = list(set(used))
-            # print(used)
             for el in dictionary.keys():
                 if el not in used: new_dict[el] = dictionary[el]
-            print("NEW DICT", new_dict)
-            print(flag)
             dictionary = new_dict
             matched = flag
-        # print(dictionary)
         return dictionary
 
+    # main function that manages simplifying
     def simplify(self):
-        # print(self.variables)
         possible = self.__get_possible_arg_vals(len(self.variables))
-        print("possible ", possible)
+        # print("possible ", possible)
         positive_results, dictionary = self.__get_positive_results(possible)
-        # print(dictionary)
-        print("positive ", positive_results)
+        # print("positive ", positive_results)
 
         if len(positive_results) == 0:
             print("Always false.")
             exit(0)
         d = {}
         for el in positive_results:
-            # print(el)
             d[int("".join(list(map(str,el))),2)] = el
         mccluskey_dict = self.__quine_mccluskey(d)
-        # print("MD", mccluskey_dict)
+
         for el in mccluskey_dict.values():
             flag = 1
             for i in el:
