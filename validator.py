@@ -18,7 +18,7 @@ class Validator(object):
         last = ''
         var = 0
 
-        # checks if there are spaces between variables or invalid characters
+        # checks if there are: spaces between variables, invalid characters
         for i in ex:
             if i in self.characters:
                 if last == ' ' and var == 1:
@@ -36,12 +36,12 @@ class Validator(object):
         # simple enum
         Number, Letter, Operator, L_Bracket, R_Bracket = range(0, 5)
 
+        # checks grammar, brackets and variables' names
         flag = 0
         prev = None
         bracket_stack = []
         for i in ex:
             if i in self.characters:
-                #print(i)
                 if prev in [R_Bracket]: raise ValueError("incorrect brackets")
                 if prev in [Number] and flag == 0:
                     raise ValueError("variable starting with a number")
