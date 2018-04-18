@@ -16,7 +16,7 @@ class Quine_McCluskey_simplifier:
         for el in rpn2:
             if el in values.keys():
                 rpn2[rpn2.index(el)] = values[el]
-        #print(self.rpn)
+        # print(self.rpn)
         # print(rpn2)
         stack = []
         for el in rpn2:
@@ -43,6 +43,13 @@ class Quine_McCluskey_simplifier:
     def __get_positive_results(self, possible_vals):
         positive = []
         dicti = {}
+        if len(self.variables) == 0:
+            result = self.__evaluate_expression({})
+            if result:
+                print("Always true.")
+            else:
+                print("Always false.")
+            exit(0)
         for i in range (0, len(possible_vals)):
             value = possible_vals[i]
             # print(value)
@@ -65,8 +72,9 @@ class Quine_McCluskey_simplifier:
 
     def __different_on_one_position(self, l1, l2):
         position = 0;
+        # print(l1, l2)
         for i in range (0, len(l1)):
-            if l1[i] in [1, 0] and l2[i] in [1, 0] and l1[i] != l2[i]:
+            if ((l1[i] in [1, 0] and l2[i] in [1, 0]) or (l1[i] in [1, 0] and l2[i] == '-') or (l2[i] in [1, 0] and l1[i] == '-')) and l1[i] != l2[i]:
                 if position > 0: return False
                 position = i+1
         return position
@@ -82,7 +90,7 @@ class Quine_McCluskey_simplifier:
             if el == 1: counter +=1
         return counter
 
-    def __buid_expression(self, dictionary, positive_results):
+    def __build_expression(self, dictionary, positive_results):
         unique_simplified = []
         unique_rows = []
         for el in dictionary:
@@ -90,8 +98,17 @@ class Quine_McCluskey_simplifier:
             if dictionary[el] not in unique_simplified:
                 unique_simplified.append(dictionary[el])
                 unique_rows.append(el)
-        # print(unique_simplified)
-        # print(unique_rows)
+        print("US", unique_simplified)
+        print("UR", unique_rows)
+        values_set = set()
+        for el in unique_rows:
+            if el.__class__ != int:
+                for i in el:
+                    values_set.add(i)
+            else:
+                values_set.add(el)
+        # print(values_set)
+
         matrix = [[0 for x in range(len(positive_results))] for y in range(len(unique_simplified))]
         values = list(positive_results.keys())
         for ind, value in enumerate(values):
@@ -99,8 +116,8 @@ class Quine_McCluskey_simplifier:
                 el = unique_rows[i]
                 if el.__class__ == int and value == el or value in el:
                     matrix[i][ind] = 1
-        # for row in matrix:
-        #     print(row)
+        for row in matrix:
+            print(row)
 
         flag = 1
         used = []
@@ -120,7 +137,7 @@ class Quine_McCluskey_simplifier:
                         if matrix[tmp][i] == 1 and values[i] not in used:
                             used.append(values[i])
                             rows_taken.add(unique_rows[tmp])
-            if set(used) == set(values):
+            if set(used) == set(values_set):
                 flag = 0
             else:
                 dots += 1
@@ -145,24 +162,27 @@ class Quine_McCluskey_simplifier:
         dictionary = values_dict
         matched = 1
         while matched:
+            print("DIC", dictionary)
             flag = 0
             # used = [][:]
             used = set()
             # print(used)
-            # print(dictionary)
             new_dict = {}
             k = list(dictionary.keys())
+            flag = 0
             for i in range(0, len(k)-1):
-                flag = 0
+                print(dictionary[k[i]])
                 for j in range (i+1, len(k)):
                     el1 = dictionary[k[i]]; el2 = dictionary[k[j]]
-                    if self.__get_number_of_ones(el1) + 1 == self.__get_number_of_ones(el2):
-                        # print(el1, el2)
+                    print(el1, el2)
+                    if abs(self.__get_number_of_ones(el1)-self.__get_number_of_ones(el2)) == 1:
+                        print(el1, el2)
                         pos = self.__different_on_one_position(el1, el2)
                         if pos:
                             flag = 1
                             merged = self.__merge(el1, pos)
-                            #print(merged)
+                            print(merged)
+                            print()
                             if k[i].__class__ == tuple:
                                 new_tuple = k[i] + k[j]
                             else:
@@ -175,7 +195,8 @@ class Quine_McCluskey_simplifier:
             # print(used)
             for el in dictionary.keys():
                 if el not in used: new_dict[el] = dictionary[el]
-            # print(new_dict)
+            print("NEW DICT", new_dict)
+            print(flag)
             dictionary = new_dict
             matched = flag
         # print(dictionary)
@@ -184,10 +205,10 @@ class Quine_McCluskey_simplifier:
     def simplify(self):
         # print(self.variables)
         possible = self.__get_possible_arg_vals(len(self.variables))
-        # print("poss ", possible)
+        print("possible ", possible)
         positive_results, dictionary = self.__get_positive_results(possible)
         # print(dictionary)
-        # print("positive ", positive_results)
+        print("positive ", positive_results)
 
         if len(positive_results) == 0:
             print("Always false.")
@@ -197,7 +218,7 @@ class Quine_McCluskey_simplifier:
             # print(el)
             d[int("".join(list(map(str,el))),2)] = el
         mccluskey_dict = self.__quine_mccluskey(d)
-        # print(mccluskey_dict)
+        # print("MD", mccluskey_dict)
         for el in mccluskey_dict.values():
             flag = 1
             for i in el:
@@ -205,5 +226,5 @@ class Quine_McCluskey_simplifier:
             if flag:
                 print("Always true.")
                 exit(0)
-        result =  self.__buid_expression(mccluskey_dict, dictionary)
-        print("Simplified: ", result)
+        result =  self.__build_expression(mccluskey_dict, dictionary)
+        return result
