@@ -18,6 +18,8 @@ class TestProcess(TestCase):
         self.assertEqual(process("a|~a&b"), process("a|b"))
         self.assertEqual(process("(a & b) | (a & ~b) & ~(~a & ~c)"), "a")
         self.assertEqual(process("(x & y) | (x & y & z) | (x & y & ~z) | (~x & y & z)"), "y&z|x&y") #y(x|z)
+        # (a & b) | ~(a & c) | (a & ~b & c) & (a & b | c) - always true
+
 
 
 
