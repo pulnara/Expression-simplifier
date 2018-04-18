@@ -48,10 +48,9 @@ class Quine_McCluskey_simplifier:
         if len(self.variables) == 0:
             result = self.__evaluate_expression({})
             if result:
-                print("Always true.")
+                return "True", {}
             else:
-                print("Always false.")
-            exit(0)
+                return "False", {}
         for i in range (0, len(possible_vals)):
             value = possible_vals[i]
             vals_list = list(value)
@@ -186,11 +185,16 @@ class Quine_McCluskey_simplifier:
         possible = self.__get_possible_arg_vals(len(self.variables))
         # print("possible ", possible)
         positive_results, dictionary = self.__get_positive_results(possible)
+
+        if len(positive_results) == 0 or positive_results == "False":
+            return "Always false"
+
+        if positive_results == "True":
+            return "Always true"
+
         # print("positive ", positive_results)
 
-        if len(positive_results) == 0:
-            print("Always false.")
-            exit(0)
+
         d = {}
         for el in positive_results:
             d[int("".join(list(map(str,el))),2)] = el
@@ -201,7 +205,6 @@ class Quine_McCluskey_simplifier:
             for i in el:
                 if i != '-': flag = 0
             if flag:
-                print("Always true.")
-                exit(0)
+                return "Always true"
         result =  self.__build_expression(mccluskey_dict, dictionary)
         return result
