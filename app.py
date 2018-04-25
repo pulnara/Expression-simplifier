@@ -2,12 +2,11 @@ from validator import Validator
 from converter import RPN_converter
 from simplifier import Quine_McCluskey_simplifier
 import sys
+import string
 
 def process(expr):
-    operators = {'|': 1, '&': 2, '^': 1, '~': 3, '>': 0, '=': 0}
-    characters = "".join([chr(i) for i in range(97, 123)]) + "".join([chr(i) for i \
-                                                                      in range(65, 91)]) + "".join(
-        list(map(str, range(10))))
+    operators = {'|': 1, '&': 2, '^': 1, '~': 3, '>': 0, '=': 0, '*': 2}
+    characters = string.ascii_lowercase + string.ascii_uppercase + "".join(list(map(str, range(10))))
     try:
         validator = Validator(operators, characters)
         expr = validator.validate(expr)
